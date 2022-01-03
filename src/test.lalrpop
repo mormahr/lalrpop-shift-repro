@@ -1,0 +1,42 @@
+use std::str::FromStr;
+
+grammar;
+
+match {
+    "+",
+    "-",
+    "(",
+    ")",
+    r"[0-9]+",
+
+    // Skip whitespace
+    r"\s*" => { },
+}
+
+Expr: i32 = {
+    <l:Expr> "+" <r:Unary> => l + r,
+    <l:Expr> "-" <r:Unary> => l - r,
+    Unary,
+};
+
+Unary: i32 = {
+  "-" <r:Unary> => -r,
+  Term,
+}
+
+Term: i32 = {
+    Num,
+    "(" <Expr> ")",
+};
+
+Num: i32 = {
+    r"[0-9]+" => i32::from_str(<>).unwrap(),
+};
+
+Stmt: i32 = {
+    Expr
+};
+
+pub Stmts: Vec<i32> = {
+    Stmt*
+};
